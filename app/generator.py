@@ -30,10 +30,7 @@ def dockerfile_from_azure(code: str) -> str:
             f"{code}\n\n"
         )
         
-        # Print the prompt to console for debugging/visibility
-        #print("==== Prompt sent to Azure OpenAI ====")
-        #print(prompt)
-        #print("===================================")
+
 
         # Use chat completions API for more robust prompting
         response = client.chat.completions.create(
@@ -50,11 +47,7 @@ def dockerfile_from_azure(code: str) -> str:
             timeout=TIMEOUT  # for OpenAI SDK >= 1.16.0
         )
 
-        #print("==== Raw Azure OpenAI response ====")
-        #print(response)
-        #print("===================================")
 
-        #print("Finish reason:", response.choices[0].finish_reason)
 
         # Extract the Dockerfile result
         dockerfile = response.choices[0].message.content.strip()
