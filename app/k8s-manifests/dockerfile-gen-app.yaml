@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerfile-gen-app
+  namespace: aidocgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dockerfile-gen-app
+  template:
+    metadata:
+      labels:
+        app: dockerfile-gen-app
+    spec:
+      containers:
+        - name: dockerfile-gen-app
+          image: vijaypranesh/dockergen:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: azure-openai-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockerfile-gen-service
+  namespace: aidocgen
+spec:
+  selector:
+    app: dockerfile-gen-app
+  ports:
+    - protocol: TCP
+      port: 80         # External port
+      targetPort: 8000 # Container port
+  type: LoadBalancer

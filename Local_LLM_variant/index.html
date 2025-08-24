@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Dockerfile Generator</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        textarea { width: 100%; height: 200px; }
+        pre { background: #f0f0f0; padding: 15px; white-space: pre-wrap; }
+        button { margin-top: 10px; padding: 10px 15px; font-size: 16px; cursor: pointer; }
+        #progressContainer { width: 100%; background-color: #eee; margin-top: 10px; display:none; }
+        #progressBar { width: 0%; height: 20px; background-color: #4CAF50; text-align: center; color: white; }
+        a { display: inline-block; margin-top: 10px; text-decoration: none; background: #4CAF50; color: white; padding: 8px 12px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>AI Dockerfile Generator</h1>
+
+    <form id="dockerForm" enctype="multipart/form-data">
+        <label>Paste code:</label><br>
+        <textarea name="code" placeholder="Paste your code here..."></textarea><br><br>
+        <label>Or upload file:</label>
+        <input type="file" name="file"><br><br>
+        <button type="submit">Generate Dockerfile</button>
+    </form>
+
+    <div id="progressContainer">
+        <div id="progressBar">0%</div>
+    </div>
+
+    <h2>Generated Dockerfile:</h2>
+    <pre id="dockerfile"></pre>
+    <a id="downloadLink" href="#" download="Dockerfile" style="display:none;">Download Dockerfile</a>
+
+    <script>
+        const form = document.getElementById('dockerForm');
+        const pre = document.getElementById('dockerfile');
+        const downloadLink = document.getElementById('downloadLink');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            pre.textContent = "";
+            downloadLink.style.display = 'none';
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressBar.style.textContent = '0%';
+            progressBar.style.backgroundColor = '#4CAF50';
+
+            const MAX_WAIT = 300; // seconds
+            const UPDATE_INTERVAL = 1000; // ms
+            let elapsed = 0;
+
+            // Simulate progress gradually up to 95% over MAX_WAIT
+            const interval = setInterval(() => {
+                elapsed += UPDATE_INTERVAL / 1000;
+                let percent = Math.min(Math.floor((elapsed / MAX_WAIT) * 95), 95);
+                progressBar.style.width = percent + '%';
+                progressBar.textContent = percent + '%';
+            }, UPDATE_INTERVAL);
+
+            const data = new FormData(form);
+            try {
+                const res = await fetch('/generate-dockerfile', { method: 'POST', body: data });
+                const json = await res.json();
+
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+
+                pre.textContent = json.dockerfile || json.error || "No output";
+
+                // Create download link
+                const blob = new Blob([pre.textContent], {type: 'text/plain'});
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.style.display = 'inline-block';
+
+                // Reset progress bar after 1s
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    progressBar.textContent = '0%';
+                }, 1000);
+
+            } catch (err) {
+                clearInterval(interval);
+                progressBar.style.backgroundColor = 'red';
+                progressBar.textContent = 'Error';
+                pre.textContent = err.toString();
+            }
+        });
+    </script>
+</body>
+</html>
