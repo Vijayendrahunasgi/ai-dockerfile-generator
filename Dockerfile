@@ -10,14 +10,8 @@ WORKDIR /app
 # Copy requirements first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Copy .env File for loading Azure API details
-#COPY .env .
-
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app source code
-# COPY . .
 
 # Copy Entire App dir
 COPY app/ ./app/
