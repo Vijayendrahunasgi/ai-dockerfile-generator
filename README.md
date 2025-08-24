@@ -87,6 +87,8 @@ Restart the app — it will now use Azure for inference when cloud mode is enabl
 📖 Usage
 Launch URL http://127.0.0.1:8000/ 
 Either paste your code snippet for which you want a base Dockerfile or attach by browsing the file and Click on Generate
+<img width="1009" height="819" alt="image" src="https://github.com/user-attachments/assets/66c9efd4-e9ab-48d5-9847-417b4af0e203" />
+
 
 
 📜 License
